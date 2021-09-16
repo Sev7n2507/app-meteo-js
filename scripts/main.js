@@ -1,11 +1,19 @@
+import tabJoursEnOrdre from './Utilitaire/gestionTemps.js';
+
+//console.log("Depuis main js"  + tabJoursEnOrdre);
+
 const CLEFAPI = '785276feedd72998e7d512153d6d56ab'
 let resultatsAPI;
 
-const temps = document.querySelector('.temps')
-const temperature = document.querySelector('.temperature')
-const localisation = document.querySelector('.localisation')
-const heure = document.querySelectorAll('.heure-nom-prevision')
-const tempPourH = document.querySelectorAll('.heure-prevision-valeur')
+const temps = document.querySelector('.temps');
+const temperature = document.querySelector('.temperature');
+const localisation = document.querySelector('.localisation');
+const heure = document.querySelectorAll('.heure-nom-prevision');
+const tempPourH = document.querySelectorAll('.heure-prevision-valeur');
+const joursDiv = document.querySelectorAll('.jour-prevision-nom');
+const tempJoursDiv = document.querySelectorAll('.jour-prevision-temps');
+const imgIcone = document.querySelector('.logo-meteo');
+const chargementContainer = document.querySelector('.overlay-icone-chargement');
 
 if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(position => {
@@ -28,7 +36,7 @@ function AppelAPI(long, lat) {
         return reponse.json();
     })
     .then((data) => {
-        console.log(data)
+        //console.log(data)
         
         resultatsAPI = data;
 
@@ -59,6 +67,31 @@ function AppelAPI(long, lat) {
         for(let j = 0; j < tempPourH.length; j++) {
             tempPourH[j].innerText = `${Math.trunc(resultatsAPI.hourly[j * 3].temp)}°`
         }
+
+
+        // 3 premiere lettre des jours pour
+
+        for(let k = 0; k < tabJoursEnOrdre.length; k++) {
+            joursDiv[k].innerText = tabJoursEnOrdre[k].slice(0, 3);
+        }
+
+        // Temp par jours
+
+        for(let m = 0; m < 7; m++) {
+            tempJoursDiv[m].innerText = `${Math.trunc(resultatsAPI.daily[m + 1].temp.day)}°`
+        }
+
+
+        // Icone dynamique
+
+        if(heureActuelle >= 6 && heureActuelle < 21) {
+            imgIcone.src = `ressources/jour/${resultatsAPI.current.weather[0].icon}.svg`
+        } else {
+            imgIcone.src = `ressources/nuit/${resultatsAPI.current.weather[0].icon}.svg`
+        }
+
+        chargementContainer.classList.add('disparition');
+
 
     })
 
